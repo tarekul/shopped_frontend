@@ -1,26 +1,47 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import {HashRouter,Link,Redirect, Route} from 'react-router-dom'
+
+import AuthContext from './contexts/auth';
+import firebase from './firebase'
 import './App.css';
 
+import Header from './components/header'
+import Home from './containers/home'
+import Signup from './containers/signup'
+import Logout from './containers/logout'
+import Login from './containers/login';
+
 class App extends Component {
+  state = {
+    user:null,
+    search: null
+  }
+
+  changeAppState = (obj) =>{
+    this.setState({})
+  }
+
+    
+  componentDidMount(){
+    this.unsubscribe = firebase.auth().onAuthStateChanged((user)=>{
+        if(user) this.setState({user:'true'})
+    })
+}  
+  
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <HashRouter>
+      <AuthContext.Provider value={this.state.user}>
+        <Route path='/' component={Header} />
+        <Route path='/' exact component={Home}/>
+        <Route path='/search/:search' exact/>
+        <Route path='/signup' component={Signup}/>
+        <Route path='/login' component={Login}/>
+        <Route path='/cart'/>
+        <Route path='/logout' component={Logout} />
+      </AuthContext.Provider>
+      </HashRouter>
+      
     );
   }
 }
