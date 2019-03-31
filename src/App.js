@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {HashRouter,Link,Redirect, Route} from 'react-router-dom'
+import {HashRouter,Link,Redirect, Route, Switch} from 'react-router-dom'
 
 import AuthContext from './contexts/auth';
 import firebase from './firebase'
@@ -24,7 +24,8 @@ class App extends Component {
     
   componentDidMount(){
     this.unsubscribe = firebase.auth().onAuthStateChanged((user)=>{
-        if(user) this.setState({user:'true'})
+        if(user) this.setState({user:user})
+        else this.setState({user:null})
     })
 }  
   
@@ -33,12 +34,14 @@ class App extends Component {
       <HashRouter>
       <AuthContext.Provider value={this.state.user}>
         <Route path='/' component={Header} />
-        <Route path='/' exact component={Home}/>
-        <Route path='/search/:search' exact/>
-        <Route path='/signup' component={Signup}/>
-        <Route path='/login' component={Login}/>
-        <Route path='/cart'/>
-        <Route path='/logout' component={Logout} />
+        <div className='container mt-5'>
+            <Switch>
+              <Route path='/' exact component={ Home } />
+              <Route path='/signup' exact component={ Signup } />
+              <Route path='/login' exact component={ Login } />
+              <Route path='/logout' exact component={ Logout } />
+            </Switch>
+          </div>
       </AuthContext.Provider>
       </HashRouter>
       

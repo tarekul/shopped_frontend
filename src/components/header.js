@@ -34,7 +34,7 @@ class Header extends Component{
         <Link className="nav-link" to="/logout">Logout</Link>
     </>
     return(
-        <nav className="navbar navbar-light bg-light" style={{backgroundColor: '#e3f2fd'}}>
+        <nav className="navbar navbar-light" style={{backgroundColor: '#97EFE9'}}>
         <a className="navbar-brand"><Link className="navbar-brand" to="/"><img id='logo' src={shopped} alt='logo'/></Link></a>
         <div className="btn-group wide">
             <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
