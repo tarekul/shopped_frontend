@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {HashRouter,Link,Redirect, Route, Switch} from 'react-router-dom'
-
+import axios from 'axios'
 import AuthContext from './contexts/auth';
+import NameContext from './contexts/name'
 import firebase from './firebase'
 import './App.css';
 
@@ -14,7 +15,8 @@ import Login from './containers/login';
 class App extends Component {
   state = {
     user:null,
-    search: null
+    search: null,
+    name:null
   }
 
   changeAppState = (obj) =>{
@@ -24,7 +26,15 @@ class App extends Component {
     
   componentDidMount(){
     this.unsubscribe = firebase.auth().onAuthStateChanged((user)=>{
-        if(user) this.setState({user:user})
+        if(user) {
+          this.setState({user:user})
+          const {email} = user
+          axios.get(`https://shopped-backend.herokuapp.com/user/${email}/email`)
+          .then(response=>{
+            console.log('lm',response.name)
+            this.setState({name:response.name})
+          })
+        }
         else this.setState({user:null})
     })
 }  
@@ -32,6 +42,7 @@ class App extends Component {
   render() {
     return (
       <HashRouter>
+      <NameContext.Provider value={this.state.name}>
       <AuthContext.Provider value={this.state.user}>
         <Route path='/' component={Header} />
         <div className='container mt-5'>
@@ -43,6 +54,7 @@ class App extends Component {
             </Switch>
           </div>
       </AuthContext.Provider>
+      </NameContext.Provider>
       </HashRouter>
       
     );

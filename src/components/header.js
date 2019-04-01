@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../contexts/auth';
 import shopped from '../assets/shopped.png'
+import axios from 'axios'
 import './header.css'
 
 class Header extends Component{
@@ -22,6 +23,7 @@ class Header extends Component{
     onSubmit = e =>{
         
     }
+
 
 
   render(){

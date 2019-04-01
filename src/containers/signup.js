@@ -27,6 +27,22 @@ export default class Signup extends React.Component {
         firebase.auth().createUserWithEmailAndPassword(email,password)
         .then(response=>{
             console.log('Returns: ',response)
+            const {name,username,address,city,state,zip,email} = this.state
+                const addressObj = {address:address,city:city,state:state,zip:zip}
+                return axios.post('https://shopped-backend.herokuapp.com/user', {
+                    username:username,
+                    name: name,
+                    email:email,
+                    address: addressObj,
+                    uid: response.user.uid
+                })
+                
+        })
+        .then(response=>{
+            const {userid} =  response.data
+            console.log(userid)
+            
+            
         })
         .catch(err=>{
             const {message} = err
@@ -37,23 +53,6 @@ export default class Signup extends React.Component {
     componentDidMount(){
         this.unsubscribe = firebase.auth().onAuthStateChanged((user)=>{
             if(user) this.props.history.push('/')
-            else{
-                const {name,username,address,city,state,zip,email} = this.state
-                const addressObj = {address:address,city:city,state:state,zip:zip}
-                // axios.post('https://shopped-backend.herokuapp.com/user', {
-                //     username:username,
-                //     name: name,
-                //     email:email,
-                //     address: addressObj
-                // })
-                // .then(response=>{
-                //     console.log(response)
-                // })
-
-                axios.get('https://shopped-backend.herokuapp.com/user/1')
-                .then(response=>console.log(response))
-                
-            }
         })
     }
 
