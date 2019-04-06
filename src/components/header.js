@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../contexts/auth';
+import NameContext from '../contexts/name'
 import shopped from '../assets/shopped.png'
 import axios from 'axios'
 import './header.css'
@@ -53,16 +54,24 @@ class Header extends Component{
             <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" onChange={e=>this.onChange(e)} onKeyDown={e=>{this.onEnter(e)}} />
             <button className="btn btn-outline-success my-2 my-sm-0" type="submit" onClick={e=>this.onSubmit(e)}>Search</button>
         </form>
-
+        
         <AuthContext.Consumer>
-                {
-                    user => {
-                    if (user) return loggedIn
-                    else return loggedOut
-                    }
+            {
+                user => {
+                if (user) return loggedIn
+                else return loggedOut
                 }
-            </AuthContext.Consumer>
-            <Link to='/cart'><img src="https://img.icons8.com/nolan/64/000000/shopping-cart.png"/></Link>
+            }
+        </AuthContext.Consumer>
+        <NameContext.Consumer>
+            {
+                name=>{
+                    if(name) return <Link className="nav-link" to="/">Hi {name}!</Link>
+                }
+            }
+        </NameContext.Consumer>
+        
+        <Link to='/cart'><img src="https://img.icons8.com/nolan/64/000000/shopping-cart.png"/></Link>
         </nav>
     )
   }

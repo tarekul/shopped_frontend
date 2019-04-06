@@ -8,6 +8,7 @@ import './App.css';
 
 import Header from './components/header'
 import Home from './containers/home'
+import Product from './containers/product'
 import Signup from './containers/signup'
 import Logout from './containers/logout'
 import Login from './containers/login';
@@ -31,11 +32,11 @@ class App extends Component {
           const {email} = user
           axios.get(`https://shopped-backend.herokuapp.com/user/${email}/email`)
           .then(response=>{
-            console.log('lm',response.name)
-            this.setState({name:response.name})
+            console.log('lm',response.data.name)
+            this.setState({name:response.data.name})
           })
         }
-        else this.setState({user:null})
+        else this.setState({user:null,name:null})
     })
 }  
   
@@ -45,14 +46,13 @@ class App extends Component {
       <NameContext.Provider value={this.state.name}>
       <AuthContext.Provider value={this.state.user}>
         <Route path='/' component={Header} />
-        <div className='container mt-5'>
-            <Switch>
+          <Switch>
               <Route path='/' exact component={ Home } />
+              <Route path='/product/:prod_id' exact component={ Product } />
               <Route path='/signup' exact component={ Signup } />
               <Route path='/login' exact component={ Login } />
               <Route path='/logout' exact component={ Logout } />
             </Switch>
-          </div>
       </AuthContext.Provider>
       </NameContext.Provider>
       </HashRouter>
