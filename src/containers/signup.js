@@ -17,7 +17,7 @@ export default class Signup extends React.Component {
 
     handleChange = (e) =>{
         this.setState({[e.target.name]:e.target.value})
-        console.log(e.target.value.slice(12))
+        console.log(e.target.value)
     }
 
 
@@ -34,7 +34,8 @@ export default class Signup extends React.Component {
                     name: name,
                     email:email,
                     address: addressObj,
-                    uid: response.user.uid
+                    uid: response.user.uid,
+                    seller:false
                 })
                 
         })

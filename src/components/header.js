@@ -35,9 +35,10 @@ class Header extends Component{
 
     const loggedIn = <>
         <Link className="nav-link" to="/logout">Logout</Link>
+        <Link className="nav-link" to="/sell">Sell</Link>
     </>
     return(
-        <nav className="navbar navbar-light" style={{backgroundColor: '#97EFE9'}}>
+        <nav className="navbar navbar-light bg-dark" style={{backgroundColor: '#97EFE9'}}>
         <a className="navbar-brand"><Link className="navbar-brand" to="/"><img id='logo' src={shopped} alt='logo'/></Link></a>
         <div className="btn-group wide">
             <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
