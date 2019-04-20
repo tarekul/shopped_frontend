@@ -2,7 +2,7 @@ import React from 'react'
 import ProductDimForm from './productdim'
 
 const AddProductForm = (props) =>{ 
-    return <><form>
+    return <>
             <div class="form-group">
             <div class="row">
                 <div class="col">
@@ -32,7 +32,7 @@ const AddProductForm = (props) =>{
             
                 </div>
             </div>
-      </form></>
+      </>
 }
 
 export default AddProductForm     

@@ -1,8 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom'
 import firebase from '../firebase';
-import AuthContext from '../contexts/auth'
-import NameContext from '../contexts/name'
 import axios from 'axios'
 
 export default class Home extends React.Component{

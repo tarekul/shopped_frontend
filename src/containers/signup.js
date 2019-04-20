@@ -1,6 +1,7 @@
 import React from 'react';
 import firebase from '../firebase';
 import axios from 'axios'
+import { withRouter } from 'react-router-dom'
 
 export default class Signup extends React.Component {
     state = {
@@ -29,7 +30,7 @@ export default class Signup extends React.Component {
             console.log('Returns: ',response)
             const {name,username,address,city,state,zip,email} = this.state
                 const addressObj = {address:address,city:city,state:state,zip:zip}
-                return axios.post('https://shopped-backend.herokuapp.com/user', {
+                return axios.post('http://localhost:3001/user', {
                     username:username,
                     name: name,
                     email:email,
@@ -52,6 +53,8 @@ export default class Signup extends React.Component {
     }
 
     componentDidMount(){
+        console.log('props',this.props.history)
+
         this.unsubscribe = firebase.auth().onAuthStateChanged((user)=>{
             if(user) this.props.history.push('/')
         })
@@ -66,6 +69,7 @@ export default class Signup extends React.Component {
         const displayError = error === '' ? '': <div className="alert alert-danger" role="alert">{error}</div>
         return (
             <>
+            <div class='container mt-5'>
               <h1>Sign Up</h1>
               {displayError}
               <form>
@@ -109,12 +113,8 @@ export default class Signup extends React.Component {
             </div>
             <button type="submit" class="btn btn-primary" onClick={this.handleSubmit}>Sign Up</button>
 
-            {/* image upload */}
-            {/* <div class="form-group">
-                <label for="exampleFormControlFile1">Example file input</label>
-                <input type="file" class="form-control-file" id="exampleFormControlFile1" accept=".png, .jpg, .jpeg" onChange={this.handleChange}/>
-            </div> */}
         </form>
+        </div>
     </>
           )
     }

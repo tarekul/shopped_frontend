@@ -1,12 +1,15 @@
 import React, {Component} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, withRouter} from 'react-router-dom'
 import axios from 'axios'
-import IdContext from '../contexts/id'
+import NameContext from '../contexts/name'
 import firebase from 'firebase'
 
 import AddProductForm from '../components/addProductForm'
+import Shop from '../components/shopPage'
+import ShowProducts from '../components/showProducts'
 
 class Sell extends Component {
+    static contextType = NameContext
     state = {
         products : [],
         shop_name:'',
@@ -23,7 +26,9 @@ class Sell extends Component {
         errorNan:null,
         saved:false,
         selected:true,
-        dimForm:false
+        dimForm:false,
+        price:5,
+        idToken:null
 
     }
 
@@ -55,13 +60,15 @@ class Sell extends Component {
             
         }
 
-        else this.setState({[e.target.name]:e.target.value})
+        else this.setState({[e.target.name]:e.target.value},()=>{
+            console.log(this.state)
+        })
         
     }
     
     handleSubmit = (e) =>{
         if(e.target.name === "save"){
-            const {prod_name,prod_description,file,category,size,width,height,length} = this.state
+            const {prod_name,prod_description,file,category,size,width,height,length,price} = this.state
             if(prod_name === '' || category === '' || file === '' || width === '' || height === '' || length ===  ''){
                 this.setState({error:'Missing input',saved:false})
             }
@@ -77,10 +84,9 @@ class Sell extends Component {
                     return snapshot.ref.getDownloadURL()
                 })
                 .then(img=>{
-                    products.push({prod_name,prod_description,img,category,size})
+                    products.push({prod_name,prod_description,img,category,size,price,width,length,height})
                     localStorage.setItem('products',JSON.stringify(products))
-                    this.setState({error:null,errorNan:null,products:products,shop_name:'',
-                    shop_description:'',
+                    this.setState({error:null,errorNan:null,products:products,
                     prod_name:'',
                     prod_description:'',
                     category:'',
@@ -92,7 +98,7 @@ class Sell extends Component {
                     file:'',
                     selected:true,
                     dimForm: false
-                },()=>console.log(this.state.products))
+                })
                 })
                 
             }
@@ -103,22 +109,58 @@ class Sell extends Component {
 
     handleSubmitStore = () =>{
         const {shop_name,shop_description,products} = this.state
+        console.log(this.context)
+        const {id} = this.context
         if(shop_name !== '' && shop_description !== '' && products.length > 0) {
-            firebase.auth().currentUser.getIdToken(true)
+            firebase.auth().currentUser.getIdToken(false)
             .then(idToken=>{
                 console.log('succees')
-                axios({
-                    method : 'post',
+                this.setState({idToken:idToken})
+                return axios({
+                    method : 'POST',
                     url:'http://localhost:3001/shop',
-                    data: {sellerid:1,shop_name : 'tarekshop13', shop_description: 'selling stuffs2'},
+                    data: {sellerid:id,shop_name : shop_name, description: shop_description},
                     headers : {token : idToken}
 
                 })
-                 
             })
-            
-            
+            .then(()=>{
+                return axios({
+                    method : 'GET',
+                    url:`http://localhost:3001/shop/${shop_name}/shop_name`,
+                })
+            })
+            .then(response=>{
+                const {shop_id} = response.data
+                products.forEach(product => {
+                    const {prod_name,prod_description,category,price,img,width,height,length} = product
+                    let size = {xs:'XS',s:'S',m:'M',l:'L'}
+                        if(category !== 'clothing') size = {width:width,height:height,length:length}
+                        const JsonSize = JSON.stringify(size)
+                        return axios({
+                            method : 'POST',
+                            url:'http://localhost:3001/product',
+                            data: {sellerid:id,shop_id:shop_id,prod_name : prod_name, description: prod_description,category:category,price:price,img:img,size:JsonSize,ratings:null},
+                            headers : {token : this.state.idToken}
+
+                        })
+                        .then(response=>console.log('suceessfully added product'))
+                        .catch(err=>console.log(err))
+                })
+            })
+            .then(()=>{
+                localStorage.setItem('products',JSON.stringify([]))
+                this.setState({products:[]})
+                return axios.put(`http://localhost:3001/user/${id}`,{
+                    seller:true
+                })
+            })
+            .then(response=>{
+                console.log(response)
+                this.props.history.push('/')
+            })
         }
+        else this.setState({error:'missing store name/description'})
     }
 
     handleInput = (e) =>{
@@ -136,24 +178,8 @@ class Sell extends Component {
             localStorage.setItem('products',JSON.stringify(prods))
         })
     }
-
-    showProducts = () =>{
-       return <><div class='container'><div class='row'>{this.state.products.map((prod,i)=>{
-             return <div class="card" key={i} style={{width: "30%",backgroundColor:'#f5f4e8'}}>
-            <img src={prod.img} class="card-img-top" alt="..." />
-            <div class="card-body">
-              <h5 class="card-title">{prod.prod_name}</h5>
-              <p class="card-text">{prod.prod_description}</p>
-              <p class="card-text">{prod.category}</p>
-              
-              
-            </div>
-            <div align="right"><button type="button" class="btn btn-danger" onClick={e=>this.handleX(i)}>X</button></div>
-          </div>  })}
-          </div></div></>
-       
-    }
     
+    handleClick = (param) =>{}
 
     render(){
         const {shop_name,shop_description,prod_name,prod_description,category,size} = this.state
@@ -193,11 +219,10 @@ class Sell extends Component {
     
 
         return (
-            
-            <IdContext.Consumer>
+            <NameContext.Consumer>
                 {
-                    isSeller =>{
-                        if(isSeller) return <h1>is a seller</h1>
+                    state =>{
+                        if(state.isSeller) return <Shop />
                         else return <>
                         <div class = "container mt-5">
                         {displaySavedAlert}
@@ -206,7 +231,7 @@ class Sell extends Component {
                         {form} 
                         <AddProductForm state={this.state} handleChange={this.handleChange} handleInput={this.handleInput}/>
                         <button type="button" class="btn btn-dark" name='save' onClick={this.handleSubmit}>save product</button>
-                        {this.showProducts()}
+                        <ShowProducts products={this.state.products} handleX={this.handleX} handleClick={this.handleClick} />
                         </div>
                         </>
                             
@@ -214,10 +239,10 @@ class Sell extends Component {
             
                     }
                 }
-            </IdContext.Consumer>
+            </NameContext.Consumer>
             
         )
     }
 }
 
-export default Sell
+export default withRouter(Sell)

@@ -21,6 +21,7 @@ class App extends Component {
     search: null,
     name:null,
     isSeller: null,
+    id:null
   }
 
   changeAppState = (obj) =>{
@@ -33,10 +34,10 @@ class App extends Component {
         if(user) {
           this.setState({user:user})
           const {email} = user
-          axios.get(`https://shopped-backend.herokuapp.com/user/${email}/email`)
+          axios.get(`http://localhost:3001/user/${email}/email`)
           .then(response=>{
             console.log('lm',response)
-            this.setState({name:response.data.name,isSeller:response.data.seller})
+            this.setState({name:response.data.name,isSeller:response.data.seller,id:response.data.userid})
           })
         }
         else this.setState({user:null,name:null})
@@ -46,8 +47,7 @@ class App extends Component {
   render() {
     return (
       <HashRouter>
-      <IdContext.Provider value={this.state.isSeller}>
-      <NameContext.Provider value={this.state.name}>
+      <NameContext.Provider value={this.state}>
       <AuthContext.Provider value={this.state.user}>
         <Route path='/' component={Header} />
           <Switch>
@@ -60,7 +60,6 @@ class App extends Component {
             </Switch>
       </AuthContext.Provider>
       </NameContext.Provider>
-      </IdContext.Provider>
       </HashRouter>
       
     );

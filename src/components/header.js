@@ -66,8 +66,8 @@ class Header extends Component{
         </AuthContext.Consumer>
         <NameContext.Consumer>
             {
-                name=>{
-                    if(name) return <Link className="nav-link" to="/">Hi {name}!</Link>
+                state=>{
+                    if(state.name) return <Link className="nav-link" to="/">Hi {state.name}!</Link>
                 }
             }
         </NameContext.Consumer>
